@@ -19,38 +19,44 @@ function ChatView() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const fetchedWorkspace = useRef(false);
+  const lastMessageRef = useRef(null);
 
   useEffect(() => {
-    if (id) GetWorkspaceData();
+    if (id && !fetchedWorkspace.current) {
+      GetWorkspaceData();
+      fetchedWorkspace.current = true;
+    }
   }, [id]);
 
   const GetWorkspaceData = async () => {
     const res = await convex.query(api.workspace.GetWorkspace, {
       workspaceId: id,
     });
-    setMessages(res?.messages);
+    setMessages(res?.messages || []);
     console.log("res get workspace", res);
   };
 
   useEffect(() => {
     if (messages?.length > 0) {
-      const role = messages[messages.length - 1].role;
-      if (role === "user") GetAiResponse();
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === "user" && lastMessage !== lastMessageRef.current) {
+        lastMessageRef.current = lastMessage;
+        GetAiResponse();
+      }
     }
   }, [messages]);
 
   useEffect(() => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100); // Allow DOM updates before scrolling
+    }, 100);
   }, [messages]);
 
   const GetAiResponse = async () => {
     const PROMPT = JSON.stringify(messages) + Prompt.CHAT_PROMPT;
     setLoading(true);
-    const result = await axios.post("/api/ai-chat", {
-      prompt: PROMPT,
-    });
+    const result = await axios.post("/api/ai-chat", { prompt: PROMPT });
     setLoading(false);
     setMessages((prev) => [...prev, { role: "ai", content: result.data.result }]);
     console.log("ai res", result);
@@ -59,17 +65,11 @@ function ChatView() {
   return (
     <div className="relative flex flex-col h-screen px-4">
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto space-y-4 py-4 pb-40 pr-2 custom-scrollbar">
-      {messages?.map((msg, index) => (
+      <div className="flex-1 overflow-y-auto space-y-4 py-4 pb-48 pr-2 custom-scrollbar">
+        {(messages || []).map((msg, index) => (
           <div key={index} className="flex gap-3 items-start px-2">
             {msg?.role === "user" && userDetail?.picture && (
-              <Image
-                src={userDetail.picture}
-                alt="User"
-                width={35}
-                height={35}
-                className="rounded-full"
-              />
+              <Image src={userDetail.picture} alt="User" width={35} height={35} className="rounded-full" />
             )}
             <p className="text-sm leading-relaxed border rounded-xl px-4 py-2 w-full max-w-3xl shadow">
               {msg.content}
@@ -89,7 +89,7 @@ function ChatView() {
         <div ref={messagesEndRef} className="h-1" />
       </div>
 
-      {/* Chat Input Box (Sticky at Bottom, Intuitive Placement) */}
+      {/* Chat Input Box */}
       <div className="sticky bottom-0 left-0 right-0 p-4 w-full max-w-3xl mx-auto border rounded-xl shadow pt-2">
         <div className="flex gap-3 items-end">
           <textarea

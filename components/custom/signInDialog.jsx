@@ -18,7 +18,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 function SignInDialog({ openDialog, closeDialog }) {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
-const CreateUser=useMutation(api.users.CreateUser)
+  const CreateUser = useMutation(api.users.CreateUser);
+
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       console.log(tokenResponse);
@@ -26,23 +27,31 @@ const CreateUser=useMutation(api.users.CreateUser)
         "https://www.googleapis.com/oauth2/v3/userinfo",
         { headers: { Authorization: "Bearer " + tokenResponse?.access_token } }
       );
-
+  
       console.log(userInfo);
       const user = userInfo.data;
-      await CreateUser({
+  
+      // Store user in database
+      const newUser = await CreateUser({
         name: user?.name,
         email: user?.email,
         picture: user?.picture,
         uid: uuidv4()
-      })
-      if(typeof window !== undefined){
-        localStorage.setItem('user', JSON.stringify(user))
+      });
+      console.log("newUser==>", newUser);
+      const storedUser = { ...user, _id: newUser };
+      
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(storedUser));
       }
-      setUserDetail(userInfo?.data);
+      
+      setUserDetail(storedUser);
       closeDialog(false);
     },
     onError: (errorResponse) => console.log(errorResponse),
   });
+  
+
   return (
     <Dialog open={openDialog} onOpenChange={closeDialog}>
       <DialogContent>

@@ -1,6 +1,6 @@
 "use client";
 import Lookup from "@/data/Lookup";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ArrowUp, Link } from "lucide-react";
 import Colors from "@/data/Colors";
 import { MessagesContext } from "@/context/MessagesContext";
@@ -17,21 +17,47 @@ function Hero() {
   const [openDialog, setOpenDialog] = useState(false);
   const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
   const router = useRouter();
+  useEffect(() => {
+    if (!userDetail?._id) {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (storedUser?._id) {
+        setUserDetail(storedUser); 
+      }
+    }
+  }, []);
+
+  
   const onGenerate = async (input) => {
+    // Ensure user is logged in
     if (!userDetail?.name) {
       setOpenDialog(true);
       return;
     }
-    setMessages({ role: "user", content: input });
+  
+    if (!userDetail?._id) {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (storedUser?._id) {
+        setUserDetail(storedUser);
+      } else {
+        console.error("User ID is missing. Please log in again.");
+        return;
+      }
+    }
+  
+    setMessages([{ role: "user", content: input }]);
     const msg = { role: "user", content: input };
-    console.log("userDetail her0", userDetail);
+  
+    console.log("userDetail hero", userDetail);
+
     const workspaceId = await CreateWorkspace({
-      user: userDetail._id,
+      user: userDetail._id || JSON.parse(localStorage.getItem("user"))?._id,
       messages: [msg],
     });
+  
     console.log("workspaceId", workspaceId);
-    router.push('/workspace/'+workspaceId);
+    router.push("/workspace/" + workspaceId);
   };
+  
   return (
     <div className="flex flex-col items-center mt-36 xl:mt-52 gap-2">
       <h2 className="font-bold text-4xl">{Lookup.HERO_HEADING}</h2>
