@@ -14,7 +14,7 @@ import axios from "axios";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function SignInDialog({ openDialog, closeDialog }) {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
@@ -22,35 +22,31 @@ function SignInDialog({ openDialog, closeDialog }) {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
       const userInfo = await axios.get(
         "https://www.googleapis.com/oauth2/v3/userinfo",
-        { headers: { Authorization: "Bearer " + tokenResponse?.access_token } }
+        { headers: { Authorization: "Bearer " + tokenResponse?.access_token } },
       );
-  
-      console.log(userInfo);
+
       const user = userInfo.data;
-  
+
       // Store user in database
       const newUser = await CreateUser({
         name: user?.name,
         email: user?.email,
         picture: user?.picture,
-        uid: uuidv4()
+        uid: uuidv4(),
       });
-      console.log("newUser==>", newUser);
       const storedUser = { ...user, _id: newUser };
-      
+
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(storedUser));
       }
-      
+
       setUserDetail(storedUser);
       closeDialog(false);
     },
     onError: (errorResponse) => console.log(errorResponse),
   });
-  
 
   return (
     <Dialog open={openDialog} onOpenChange={closeDialog}>

@@ -21,19 +21,18 @@ function Hero() {
     if (!userDetail?._id) {
       const storedUser = JSON.parse(localStorage.getItem("user"));
       if (storedUser?._id) {
-        setUserDetail(storedUser); 
+        setUserDetail(storedUser);
       }
     }
   }, []);
 
-  
   const onGenerate = async (input) => {
     // Ensure user is logged in
     if (!userDetail?.name) {
       setOpenDialog(true);
       return;
     }
-  
+
     if (!userDetail?._id) {
       const storedUser = JSON.parse(localStorage.getItem("user"));
       if (storedUser?._id) {
@@ -43,21 +42,18 @@ function Hero() {
         return;
       }
     }
-  
+
     setMessages([{ role: "user", content: input }]);
     const msg = { role: "user", content: input };
-  
-    console.log("userDetail hero", userDetail);
 
     const workspaceId = await CreateWorkspace({
       user: userDetail._id || JSON.parse(localStorage.getItem("user"))?._id,
       messages: [msg],
     });
-  
-    console.log("workspaceId", workspaceId);
+
     router.push("/workspace/" + workspaceId);
   };
-  
+
   return (
     <div className="flex flex-col items-center mt-36 xl:mt-52 gap-2">
       <h2 className="font-bold text-4xl">{Lookup.HERO_HEADING}</h2>

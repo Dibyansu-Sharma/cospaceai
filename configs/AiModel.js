@@ -21,8 +21,19 @@ const generationConfig = {
 
 export const chatSession = model.startChat({
   generationConfig,
-  history: [],
+  history: [], // Initialize with empty history
 });
 
-// const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-// console.log(result.response.text());
+// Code Generation Config
+const CodeGenerationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: "application/json",
+};
+
+export const GenAICode = model.startChat({
+  generationConfig: CodeGenerationConfig,
+  history: [],
+});
