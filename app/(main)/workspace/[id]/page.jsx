@@ -1,6 +1,6 @@
 "use client";
-import ChatView from "@/components/custom/chatView";
-import CodeView from "@/components/custom/codeView";
+import ChatView from "@/components/custom/ChatView";
+import CodeView from "@/components/custom/CodeView";
 import Header from "@/components/custom/Header";
 import React from "react";
 
