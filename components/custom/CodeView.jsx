@@ -16,6 +16,7 @@ import { useConvex, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import SandpackPreviewClient from "./SandpackPreviewClient";
 
 const countToken = (inputText) => {
   return inputText
@@ -35,7 +36,6 @@ function CodeView() {
   const UpdateTokens = useMutation(api.users.UpdateToken);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
-  // Fetch user details and token when user logs in
   useEffect(() => {
     if (userDetail?.email) {
       fetchUserToken(userDetail.email);
@@ -47,7 +47,6 @@ function CodeView() {
       const existingUser = await convex.query(api.users.GetUser, { email });
 
       if (existingUser) {
-        // Ensure we have the latest token from the database
         setUserDetail(existingUser);
       } else {
         console.error("User not found in database.");
@@ -162,7 +161,6 @@ function CodeView() {
         </button>
       </div>
 
-      {/* Loader */}
       {loading ? (
         <div className="flex items-center justify-center h-80">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-500"></div>
@@ -173,9 +171,7 @@ function CodeView() {
           template="react"
           theme="dark"
           customSetup={{ dependencies: { ...Lookup.DEPENDANCY } }}
-          options={{
-            externalResources: ["https://unpkg.com/@tailwindcss/browser@4"],
-          }}
+          options={{ externalResources: ["https://unpkg.com/@tailwindcss/browser@4"] }}
         >
           <SandpackLayout className="border border-gray-700 rounded-md mt-4">
             {activeTab === "code" ? (
@@ -184,10 +180,7 @@ function CodeView() {
                 <SandpackCodeEditor className="h-[80vh] bg-gray-800" />
               </>
             ) : (
-              <SandpackPreview
-                className="h-full border border-gray-700 rounded-md"
-                showNavigator={true}
-              />
+              <SandpackPreviewClient />
             )}
           </SandpackLayout>
         </SandpackProvider>

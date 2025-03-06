@@ -13,7 +13,7 @@ function PricingModel() {
           <h2 className='font-medium text-lg'>{pricing.tokens} Tokens</h2>
           <p className='text-gray-400'>{pricing.desc}</p>
           <h2 className='font-bold text-4xl text-center mt-6'>${pricing.price}</h2>
-          <Button className='cursor-pointer'>Upgrade to {pricing.name}</Button>
+          <Button className='cursor-pointer overflow-hidden text-ellipsis'>{pricing.name}</Button>
         </div>
       ))}
     </div>

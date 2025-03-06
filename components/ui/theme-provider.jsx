@@ -2,7 +2,7 @@
 
 import React, { use, useEffect } from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import Header from "../custom/header";
+import Header from "../custom/Header";
 import { useState } from "react";
 import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
@@ -11,10 +11,12 @@ import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AppSidebar } from "../custom/AppSidebar";
 import { SidebarProvider } from "./sidebar";
+import { ActionContext } from "@/context/ActionContext";
 
 function Provider({ children }) {
   const [messages, setMessages] = useState();
   const [userDetail, setUserDetail] = useState();
+  const [action, setAction] = useState();
 
   const convex = useConvex();
 
@@ -41,6 +43,7 @@ function Provider({ children }) {
       >
         <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
           <MessagesContext.Provider value={{ messages, setMessages }}>
+            <ActionContext.Provider value={{action, setAction}}>
             <NextThemesProvider
               attribute="class"
               defaultTheme="system"
@@ -53,6 +56,7 @@ function Provider({ children }) {
                 {children}
               </SidebarProvider>
             </NextThemesProvider>
+            </ActionContext.Provider>
           </MessagesContext.Provider>
         </UserDetailContext.Provider>
       </GoogleOAuthProvider>

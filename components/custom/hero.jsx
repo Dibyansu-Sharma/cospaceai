@@ -5,7 +5,7 @@ import { ArrowUp, Link } from "lucide-react";
 import Colors from "@/data/Colors";
 import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
-import SignInDialog from "./signInDialog";
+import SignInDialog from "./SignInDialog";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
